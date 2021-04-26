@@ -17,7 +17,7 @@ def run_styler(net, epochs, loss_ratio):
     x = torch.rand(net.inshape)
     optimizer = optim.Adam([x], lr=1e-4)
 
-    for i in range(epochs):#tqdm(range(epochs), desc='Optimization progress'):
+    for i in tqdm(range(epochs), desc='Optimization progress'):
         x.data.clamp(0, 1)
         y = net(x)
 
