@@ -40,7 +40,7 @@ class Styler(nn.Module):
         VGG19 = VGG19.to(Styler.device)
 
         assert content_im.size() == style_im.size(), "Content and style images should have the same aspect ratio."
-        self.input_shape = content_im.size()
+        self.inshape = content_im.size()
         self.model = nn.Sequential(norm)
 
         ldf = Styler.layer_dict_flip
