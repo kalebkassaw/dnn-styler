@@ -31,7 +31,7 @@ def unload(i, ax, title=None):
     torch_unload = transforms.ToPILImage()
     im = i.cpu().clone()
     im = im.squeeze(0)
-    im = torch_unload(image)
+    im = torch_unload(im)
     ax.imshow(im)
     ax.axis('off')
     if title is not None: ax.set_title(title)
