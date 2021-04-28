@@ -14,13 +14,9 @@ from tools import net, image, loss
 
 def run_styler(net, input_image, epochs, loss_ratio):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    
-    #x = torch.rand(net.inshape).to(device)
-    #x = torch.ones(input_image.shape).to(device)
     x = input_image.to(device)
     x.requires_grad = True
-    #optimizer = optim.LBFGS([x], max_iter=epochs)#Adam([x], lr=0.1)
-    optimizer = optim.LBFGS([x.requires_grad_()], lr=1.0)
+    optimizer = optim.LBFGS([x.requires_grad_()], lr=1.0)#Adam([x], lr=0.1)
 
     def closure():
         optimizer.zero_grad()
@@ -35,21 +31,27 @@ def run_styler(net, input_image, epochs, loss_ratio):
 
         if(style_loss > 1e3):
             print('Overflow, style_loss = %.3f' % (style_loss))
-            style_loss = 0.1
+            # style_loss = 0.1
+            return np.inf
             
         style_loss /= loss_ratio
-        loss = (content_loss + style_loss)/len(net.style_losses)
+        style_loss /= len(net.style_losses)
+        loss = content_loss + style_loss
         
         #print("Content loss: {}, style loss: {}".format(content_loss, style_loss))
         loss.backward()
                 
         return loss
         
+    best_loss = np.inf
+
     for i in range(epochs):
         l = optimizer.step(closure)
         print('Epoch: %d \t Loss: %.3f' % (i+1, l))
-        if(l == np.inf):
-            break
+        if l > best_loss * 2: 
+            x = x.clone().to(device) + torch.randn(x.shape) * 1e-3
+            continue
+        elif l < best_loss: best_loss = l
         
-    x.data.clamp(0, 1)
+    x.data.clamp_(0, 1)
     return x

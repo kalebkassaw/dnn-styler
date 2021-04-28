@@ -35,3 +35,15 @@ def unload(i, ax, title=None):
     ax.imshow(im)
     ax.axis('off')
     if title is not None: ax.set_title(title)
+
+def save(i, filename):
+    torch_unload = transforms.ToPILImage()
+    im = i.cpu().clone()
+    im = im.squeeze(0)
+    im = torch_unload(im)
+    im.save("outputs/{}.jpg".format(filename))
+
+def clipImage(image):
+    im = Image.open(image)
+    im = im.resize(512, 512)
+    im.save("images/crop/{}".format(filename))
